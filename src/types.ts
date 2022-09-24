@@ -14,3 +14,7 @@ export interface Frame {
 	throws: [number, number | null, number?];
 	status: FrameStatus;
 }
+
+export interface BowlingThrows {
+	[key: number]: Frame;
+}

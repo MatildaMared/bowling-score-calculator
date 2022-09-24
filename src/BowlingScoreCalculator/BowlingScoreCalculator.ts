@@ -1,8 +1,8 @@
-import { Frame, FrameStatus, Throw } from "../types";
+import { Frame, FrameStatus, Throw, BowlingThrows } from "../types";
 
 export class BowlingScoreCalculator {
 	name: string;
-	bowlingThrows: Frame[] = [];
+	bowlingThrows: BowlingThrows = {};
 	currentFrame: number = 1;
 	totalScore: number = 0;
 	gameCompleted: boolean = false;
@@ -26,16 +26,20 @@ export class BowlingScoreCalculator {
 	}
 
 	getThrowForOneFrameBack() {
-		if (this.currentFrame - 1 <= 0) {
-			return this.bowlingThrows[this.bowlingThrows.length - 1];
+		if (this.currentFrame === 10) {
+			return this.bowlingThrows[10];
+		} else if (this.currentFrame - 1 <= 0) {
+			return this.bowlingThrows[this.currentFrame - 1];
 		}
 
 		return null;
 	}
 
 	getThrowForTwoFramesBack() {
-		if (this.currentFrame - 2 >= 0) {
-			return this.bowlingThrows[this.bowlingThrows.length - 2];
+		if (this.currentFrame === 10) {
+			return this.bowlingThrows[10];
+		} else if (this.currentFrame - 2 >= 0) {
+			return this.bowlingThrows[this.currentFrame - 1];
 		}
 
 		return null;
