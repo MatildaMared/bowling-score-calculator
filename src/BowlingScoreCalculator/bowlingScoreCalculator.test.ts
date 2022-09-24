@@ -11,7 +11,7 @@ describe("Bowling Score Calculator", () => {
 		}
 
 		const expected = 300;
-		const result = bowlingScoreCalculator.totalPoints;
+		const result = bowlingScoreCalculator.totalScore;
 
 		expect(result).toBe(expected);
 	});
