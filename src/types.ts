@@ -1,7 +1,9 @@
 export enum FrameStatus {
 	Strike = "strike",
 	Spare = "spare",
-	Points = "points",
+	CompletedWithPoints = "points",
+	CompletedWithNoPoints = "no points",
+	NotCompleted = "not completed",
 }
 
 export enum Throw {
@@ -10,9 +12,16 @@ export enum Throw {
 	Miss = "-",
 }
 
-export interface Frame {
-	throws: [number, number | null, number?];
+export class Frame {
+	throws: number[];
+	points: number;
 	status: FrameStatus;
+
+	constructor() {
+		this.throws = [];
+		this.points = 0;
+		this.status = FrameStatus.NotCompleted;
+	}
 }
 
 export interface BowlingThrows {

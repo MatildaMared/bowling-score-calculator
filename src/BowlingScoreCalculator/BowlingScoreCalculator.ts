@@ -9,6 +9,7 @@ export class BowlingScoreCalculator {
 
 	constructor(name: string) {
 		this.name = name;
+		this.bowlingThrows[this.currentFrame] = new Frame();
 	}
 
 	addThrow(newThrow: string | Throw) {
@@ -25,70 +26,78 @@ export class BowlingScoreCalculator {
 		}
 	}
 
-	getThrowForOneFrameBack() {
-		if (this.currentFrame === 10) {
-			return this.bowlingThrows[10];
-		} else if (this.currentFrame - 1 <= 0) {
-			return this.bowlingThrows[this.currentFrame - 1];
+	private addScoreForLastFrame(pointsForCurrentThrow: number) {
+		let score = pointsForCurrentThrow;
+
+		if (
+			this.bowlingThrows[8].status === FrameStatus.Strike &&
+			this.bowlingThrows[10].throws.length === 1
+		) {
+			this.bowlingThrows[8].points += pointsForCurrentThrow;
+			score += pointsForCurrentThrow;
+		}
+		if (
+			this.bowlingThrows[9].status === FrameStatus.Strike &&
+			(this.bowlingThrows[10].throws.length === 1 ||
+				this.bowlingThrows[10].throws.length === 2)
+		) {
+			this.bowlingThrows[9].points += pointsForCurrentThrow;
+			score += pointsForCurrentThrow;
 		}
 
-		return null;
+		this.totalScore += score;
+		this.bowlingThrows[10].points += pointsForCurrentThrow;
+		return;
 	}
 
-	getThrowForTwoFramesBack() {
-		if (this.currentFrame === 10) {
-			return this.bowlingThrows[10];
-		} else if (this.currentFrame - 2 >= 0) {
-			return this.bowlingThrows[this.currentFrame - 1];
-		}
+	private addScore(pointsForCurrentThrow: number) {
+		let score = pointsForCurrentThrow;
 
-		return null;
-	}
-
-	addPointsIncludingPreviousFrames(pointsForCurrentFrame: number) {
-		this.totalScore += pointsForCurrentFrame;
-
-		const throwForOneFrameBack = this.getThrowForOneFrameBack();
-		const throwForTwoFramesBack = this.getThrowForTwoFramesBack();
+		const throwForOneFrameBack = this.bowlingThrows[this.currentFrame - 1];
+		const throwForTwoFramesBack = this.bowlingThrows[this.currentFrame - 2];
 
 		if (
 			throwForOneFrameBack &&
 			throwForOneFrameBack.status === FrameStatus.Strike
 		) {
-			console.log("🎳 Adding points for previous strike!");
-			this.totalScore += pointsForCurrentFrame;
+			score += pointsForCurrentThrow;
+			throwForOneFrameBack.points += pointsForCurrentThrow;
 		}
 
 		if (
 			throwForTwoFramesBack &&
 			throwForTwoFramesBack.status === FrameStatus.Strike
 		) {
-			console.log("🎳 Adding points for previous strike or spare!");
-			this.totalScore += pointsForCurrentFrame;
+			score += pointsForCurrentThrow;
+			throwForTwoFramesBack.points += pointsForCurrentThrow;
+		}
+
+		this.bowlingThrows[this.currentFrame].points += pointsForCurrentThrow;
+		this.totalScore += score;
+	}
+
+	private handleStrike() {
+		let currentFrame = this.bowlingThrows[this.currentFrame];
+
+		if (this.currentFrame === 10) {
+			currentFrame.throws.push(10);
+			currentFrame.status = FrameStatus.Strike;
+			this.addScoreForLastFrame(10);
+			if (currentFrame.throws.length === 3) {
+				this.gameCompleted = true;
+				this.announce();
+			}
+		} else {
+			this.bowlingThrows[this.currentFrame].throws.push(10);
+			this.bowlingThrows[this.currentFrame].status = FrameStatus.Strike;
+			this.addScore(10);
+			this.advanceFrame();
 		}
 	}
 
-	handleStrike() {
-		console.log(
-			"will handle points for strike for frame number: ",
-			this.currentFrame
-		);
-
-		if (this.currentFrame === 10) {
-			console.log("On the last frame!");
-			if (this.bowlingThrows.length === 11) {
-				this.gameCompleted = true;
-			}
-		} else {
-			this.currentFrame++;
-		}
-
-		this.bowlingThrows.push({
-			throws: [10, null],
-			status: FrameStatus.Strike,
-		});
-
-		this.addPointsIncludingPreviousFrames(10);
+	private advanceFrame() {
+		this.bowlingThrows[this.currentFrame + 1] = new Frame();
+		this.currentFrame++;
 	}
 
 	announce() {
@@ -102,15 +111,4 @@ export class BowlingScoreCalculator {
 			);
 		}
 	}
-
-	// 	addThrow(throw: number) {
-	// 		if (throw === 10) {
-	// 			// Om strike
-	// 			this.bowlingScore[this.currentFrame - 1].throws = [10, null];
-	// 			this.bowlingScore[this.currentFrame - 1].status = FrameStatus.Strike;
-	// 			this.totalPoints += 10;
-	// 			this.currentFrame += 1;
-	// 		}
-	// 	return "Good job";
-	// }
 }
