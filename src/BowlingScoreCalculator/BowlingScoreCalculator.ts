@@ -16,7 +16,6 @@ export class BowlingScoreCalculator {
 		const currentFrame = this.bowlingThrows[this.currentFrame];
 
 		if (this.gameCompleted) {
-			console.log(this.bowlingThrows);
 			throw new Error(
 				"This game is completed, please start a new game if you want to continue playing!"
 			);
@@ -36,11 +35,15 @@ export class BowlingScoreCalculator {
 				currentFrame.throws.push(+newThrow);
 				this.addScore(+newThrow);
 				if (currentFrame.throws.length === 2) {
-					this.advanceFrame();
-					this.currentFrame === 10 &&
-						currentFrame.status === FrameStatus.Completed;
-					this.gameCompleted = true;
+					if (this.currentFrame === 10) {
+						currentFrame.status = FrameStatus.Completed;
+						this.gameCompleted = true;
+					} else {
+						currentFrame.status = FrameStatus.Completed;
+						this.advanceFrame();
+					}
 				}
+
 				break;
 		}
 	}
@@ -65,7 +68,16 @@ export class BowlingScoreCalculator {
 	}
 
 	private handleMiss() {
-		console.log("Oh no you missed...");
+		const currentFrame = this.bowlingThrows[this.currentFrame];
+		currentFrame.throws.push(0);
+		if (currentFrame.throws.length === 2) {
+			currentFrame.status = FrameStatus.Completed;
+			if (this.currentFrame === 10) {
+				this.gameCompleted = true;
+			} else {
+				this.advanceFrame();
+			}
+		}
 	}
 
 	private addScoreForLastFrame(pointsForCurrentThrow: number) {
@@ -112,8 +124,8 @@ export class BowlingScoreCalculator {
 		if (throwForOneFrameBack) {
 			switch (throwForOneFrameBack.status) {
 				case FrameStatus.Strike:
-					score += pointsForCurrentThrow;
 					throwForOneFrameBack.points += pointsForCurrentThrow;
+					score += pointsForCurrentThrow;
 					break;
 				case FrameStatus.Spare:
 					if (currentFrame.throws.length === 1) {
@@ -130,11 +142,13 @@ export class BowlingScoreCalculator {
 			throwForTwoFramesBack &&
 			throwForTwoFramesBack.status === FrameStatus.Strike
 		) {
-			score += pointsForCurrentThrow;
-			throwForTwoFramesBack.points += pointsForCurrentThrow;
+			if (currentFrame.status === FrameStatus.Strike) {
+				score += pointsForCurrentThrow;
+				throwForTwoFramesBack.points += pointsForCurrentThrow;
+			}
 		}
 
-		this.bowlingThrows[this.currentFrame].points += pointsForCurrentThrow;
+		currentFrame.points += pointsForCurrentThrow;
 		this.totalScore += score;
 	}
 
@@ -147,7 +161,6 @@ export class BowlingScoreCalculator {
 			this.addScoreForLastFrame(10);
 			if (currentFrame.throws.length === 3) {
 				this.gameCompleted = true;
-				this.announce();
 			}
 		} else {
 			this.bowlingThrows[this.currentFrame].throws.push(10);
