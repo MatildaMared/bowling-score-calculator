@@ -13,12 +13,12 @@ export enum Throw {
 
 export class Frame {
 	throws: number[];
-	points: number;
+	score: number;
 	status: FrameStatus;
 
 	constructor() {
 		this.throws = [];
-		this.points = 0;
+		this.score = 0;
 		this.status = FrameStatus.NotCompleted;
 	}
 }
