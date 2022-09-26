@@ -56,7 +56,6 @@ export class BowlingScoreCalculator {
 		this.addStatsToFrame(scoreForCurrentThrow, FrameStatus.Spare);
 
 		if (this.currentFrame === 10) {
-			// this.addScoreForLastFrame(scoreForCurrentThrow);
 			this.addScore(scoreForCurrentThrow);
 			if (currentFrame.throws.length === 3) {
 				this.gameCompleted = true;
@@ -123,7 +122,6 @@ export class BowlingScoreCalculator {
 	private handleStrike() {
 		if (this.currentFrame === 10) {
 			this.addStatsToFrame(10, FrameStatus.Strike);
-			// this.addScoreForLastFrame(10);
 			this.addScore(10);
 			if (this.bowlingThrows[this.currentFrame].throws.length === 3) {
 				this.gameCompleted = true;
