@@ -13,7 +13,10 @@ export class BowlingScoreCalculator {
 	}
 
 	addThrow(newThrow: string | Throw) {
+		const currentFrame = this.bowlingThrows[this.currentFrame];
+
 		if (this.gameCompleted) {
+			console.log(this.bowlingThrows);
 			throw new Error(
 				"This game is completed, please start a new game if you want to continue playing!"
 			);
@@ -30,13 +33,26 @@ export class BowlingScoreCalculator {
 				this.handleMiss();
 				break;
 			default:
-				console.log("Your throw: ", newThrow);
+				currentFrame.throws.push(+newThrow);
+				this.addScore(+newThrow);
+				if (currentFrame.throws.length === 2) {
+					this.advanceFrame();
+					this.currentFrame === 10 &&
+						currentFrame.status === FrameStatus.Completed;
+					this.gameCompleted = true;
+				}
 				break;
 		}
 	}
 
 	private handleSpare() {
-		console.log("You got a spare");
+		const currentFrame = this.bowlingThrows[this.currentFrame];
+		const scoreForCurrentThrow =
+			10 - this.bowlingThrows[this.currentFrame].throws[0];
+		currentFrame.throws.push(scoreForCurrentThrow);
+		currentFrame.status = FrameStatus.Spare;
+		this.addScore(scoreForCurrentThrow);
+		this.advanceFrame();
 	}
 
 	private handleMiss() {
@@ -70,15 +86,25 @@ export class BowlingScoreCalculator {
 	private addScore(pointsForCurrentThrow: number) {
 		let score = pointsForCurrentThrow;
 
+		const currentFrame = this.bowlingThrows[this.currentFrame];
 		const throwForOneFrameBack = this.bowlingThrows[this.currentFrame - 1];
 		const throwForTwoFramesBack = this.bowlingThrows[this.currentFrame - 2];
 
-		if (
-			throwForOneFrameBack &&
-			throwForOneFrameBack.status === FrameStatus.Strike
-		) {
-			score += pointsForCurrentThrow;
-			throwForOneFrameBack.points += pointsForCurrentThrow;
+		if (throwForOneFrameBack) {
+			switch (throwForOneFrameBack.status) {
+				case FrameStatus.Strike:
+					score += pointsForCurrentThrow;
+					throwForOneFrameBack.points += pointsForCurrentThrow;
+					break;
+				case FrameStatus.Spare:
+					if (currentFrame.throws.length === 1) {
+						throwForOneFrameBack.points += pointsForCurrentThrow;
+						score += pointsForCurrentThrow;
+					}
+					break;
+				default:
+					break;
+			}
 		}
 
 		if (

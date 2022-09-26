@@ -1,8 +1,7 @@
 export enum FrameStatus {
 	Strike = "strike",
 	Spare = "spare",
-	CompletedWithPoints = "points",
-	CompletedWithNoPoints = "no points",
+	Completed = "completed",
 	NotCompleted = "not completed",
 }
 

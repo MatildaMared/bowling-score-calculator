@@ -27,6 +27,8 @@ describe("Bowling Score Calculator", () => {
 
 		const expected = 150;
 		const result = bowlingScoreCalculator.totalScore;
+		bowlingScoreCalculator.announce();
+		console.log(bowlingScoreCalculator.bowlingThrows);
 
 		expect(result).toBe(expected);
 	});
