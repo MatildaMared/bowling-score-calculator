@@ -19,11 +19,28 @@ export class BowlingScoreCalculator {
 			);
 		}
 
-		if (newThrow === Throw.Strike) {
-			this.handleStrike();
-		} else if (newThrow === Throw.Spare) {
-			console.log("You got a spare! 🌈");
+		switch (newThrow) {
+			case Throw.Strike:
+				this.handleStrike();
+				break;
+			case Throw.Spare:
+				this.handleSpare();
+				break;
+			case Throw.Miss:
+				this.handleMiss();
+				break;
+			default:
+				console.log("Your throw: ", newThrow);
+				break;
 		}
+	}
+
+	private handleSpare() {
+		console.log("You got a spare");
+	}
+
+	private handleMiss() {
+		console.log("Oh no you missed...");
 	}
 
 	private addScoreForLastFrame(pointsForCurrentThrow: number) {
