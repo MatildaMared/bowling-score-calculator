@@ -56,7 +56,8 @@ export class BowlingScoreCalculator {
 		this.addStatsToFrame(scoreForCurrentThrow, FrameStatus.Spare);
 
 		if (this.currentFrame === 10) {
-			this.addScoreForLastFrame(scoreForCurrentThrow);
+			// this.addScoreForLastFrame(scoreForCurrentThrow);
+			this.addScore(scoreForCurrentThrow);
 			if (currentFrame.throws.length === 3) {
 				this.gameCompleted = true;
 			}
@@ -80,43 +81,8 @@ export class BowlingScoreCalculator {
 		}
 	}
 
-	private addScoreForLastFrame(pointsForCurrentThrow: number) {
-		let score = pointsForCurrentThrow;
-		const currentFrame = this.bowlingThrows[this.currentFrame];
-		const throwForOneFrameBack = this.bowlingThrows[this.currentFrame - 1];
-		const throwForTwoFramesBack = this.bowlingThrows[this.currentFrame - 2];
-
-		if (
-			throwForTwoFramesBack.status === FrameStatus.Strike &&
-			currentFrame.throws.length === 1
-		) {
-			throwForTwoFramesBack.score += pointsForCurrentThrow;
-			score += pointsForCurrentThrow;
-		}
-
-		if (
-			throwForOneFrameBack.status === FrameStatus.Strike &&
-			(currentFrame.throws.length === 1 || currentFrame.throws.length === 2)
-		) {
-			throwForOneFrameBack.score += pointsForCurrentThrow;
-			score += pointsForCurrentThrow;
-		}
-
-		if (
-			throwForOneFrameBack.status === FrameStatus.Spare &&
-			currentFrame.throws.length === 1
-		) {
-			throwForOneFrameBack.score += pointsForCurrentThrow;
-			score += pointsForCurrentThrow;
-		}
-
-		this.totalScore += score;
-		currentFrame.score += pointsForCurrentThrow;
-	}
-
 	private addScore(pointsForCurrentThrow: number) {
 		let score = pointsForCurrentThrow;
-
 		const currentFrame = this.bowlingThrows[this.currentFrame];
 		const throwForOneFrameBack = this.bowlingThrows[this.currentFrame - 1];
 		const throwForTwoFramesBack = this.bowlingThrows[this.currentFrame - 2];
@@ -124,6 +90,7 @@ export class BowlingScoreCalculator {
 		if (throwForOneFrameBack) {
 			switch (throwForOneFrameBack.status) {
 				case FrameStatus.Strike:
+					if (currentFrame.throws.length === 3) return;
 					throwForOneFrameBack.score += pointsForCurrentThrow;
 					score += pointsForCurrentThrow;
 					break;
@@ -143,6 +110,7 @@ export class BowlingScoreCalculator {
 			throwForTwoFramesBack.status === FrameStatus.Strike
 		) {
 			if (currentFrame.status === FrameStatus.Strike) {
+				if (currentFrame.throws.length === 3) return;
 				score += pointsForCurrentThrow;
 				throwForTwoFramesBack.score += pointsForCurrentThrow;
 			}
@@ -155,7 +123,8 @@ export class BowlingScoreCalculator {
 	private handleStrike() {
 		if (this.currentFrame === 10) {
 			this.addStatsToFrame(10, FrameStatus.Strike);
-			this.addScoreForLastFrame(10);
+			// this.addScoreForLastFrame(10);
+			this.addScore(10);
 			if (this.bowlingThrows[this.currentFrame].throws.length === 3) {
 				this.gameCompleted = true;
 			}
